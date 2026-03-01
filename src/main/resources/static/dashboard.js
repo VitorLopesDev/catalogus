@@ -1,28 +1,10 @@
-// ============================================================
-// dashboard.js — versão modernizada
-//
-// Novidades em relação à versão anterior:
-// - Lista de livros guardada em memória (livrosCached)
-// - Busca em tempo real filtrando localmente
-// - Estatísticas calculadas a partir dos dados em memória
-// - Animação de entrada escalonada nos cards
-// ============================================================
+
 
 const API_URL = 'http://localhost:8080';
 
-// ============================================================
-// CACHE LOCAL
-//
-// Guardamos a lista completa aqui após carregar do backend.
-// A busca filtra esse array em vez de chamar o backend a
-// cada letra digitada — mais rápido e sem sobrecarregar o servidor.
-// ============================================================
 let livrosCached = [];
 let tituloEditando = null;
 
-// ============================================================
-// 1. AUTENTICAÇÃO E NAVBAR
-// ============================================================
 function carregarUsuario() {
     const email = localStorage.getItem('userEmail');
     if (!email) {
@@ -37,9 +19,6 @@ function logout() {
     window.location.href = 'index.html';
 }
 
-// ============================================================
-// 2. CARREGAR LIVROS DO BACKEND
-// ============================================================
 async function carregarLivros() {
     const grid       = document.getElementById('booksGrid');
     const emptyState = document.getElementById('emptyState');
@@ -64,7 +43,7 @@ async function carregarLivros() {
         }
 
         const livros = await response.json();
-        // Salva no cache para a busca usar
+
         livrosCached = livros;
 
         atualizarEstatisticas(livros);
@@ -87,17 +66,7 @@ async function carregarLivros() {
     }
 }
 
-// ============================================================
-// 3. RENDERIZAR CARDS
-//
-// Recebe um array de livros (pode ser a lista completa ou
-// o resultado filtrado) e injeta no grid com animação escalonada.
-//
-// ANIMAÇÃO ESCALONADA:
-// Cada card recebe um animation-delay diferente calculado
-// pelo índice: index * 80ms. Isso cria o efeito de cascata
-// onde os cards aparecem um após o outro.
-// ============================================================
+
 function renderizarCards(livros) {
     const grid       = document.getElementById('booksGrid');
     const emptyState = document.getElementById('emptyState');
@@ -113,15 +82,11 @@ function renderizarCards(livros) {
     });
 }
 
-// ============================================================
-// 4. CRIAR CARD com animação escalonada
-// ============================================================
 function criarCard(livro, index = 0) {
     const card = document.createElement('div');
     card.className = 'book-card';
 
-    // animation-delay escalonado: cada card espera um pouco mais
-    // que o anterior para criar o efeito de cascata
+
     card.style.animationDelay = `${index * 80}ms`;
 
     card.innerHTML = `
@@ -137,7 +102,6 @@ function criarCard(livro, index = 0) {
             </div>
         </div>`;
 
-    // textContent é seguro contra XSS
     card.querySelector('.book-title').textContent       = livro.title;
     card.querySelector('.js-autor').textContent         = livro.author;
     card.querySelector('.js-isbn').textContent          = livro.isbn || 'Não informado';
@@ -149,35 +113,22 @@ function criarCard(livro, index = 0) {
     return card;
 }
 
-// ============================================================
-// 5. ESTATÍSTICAS
-//
-// Calculamos tudo a partir do array em memória (livrosCached),
-// sem precisar de endpoints extras no backend.
-//
-// Set() cria uma coleção de valores únicos — usamos para
-// contar autores distintos sem repetição.
-// ============================================================
 function atualizarEstatisticas(livros) {
     const total = livros.length;
 
-    // new Set() elimina duplicatas automaticamente
-    // .size retorna quantos itens únicos existem
     const autoresUnicos = new Set(livros.map(l => l.author.trim())).size;
 
     const comIsbn = livros.filter(l => l.isbn && l.isbn.trim() !== '').length;
 
-    // Animação de contagem numérica (count-up)
     animarNumero('statTotal',   total);
     animarNumero('statAutores', autoresUnicos);
     animarNumero('statIsbn',    comIsbn);
 }
 
-// Anima o número de 0 até o valor final em 600ms
 function animarNumero(elementId, valorFinal) {
     const el       = document.getElementById(elementId);
-    const duracao  = 600;   // duração total em ms
-    const intervalo = 16;   // ~60fps
+    const duracao  = 600;
+    const intervalo = 16;
     const passos   = duracao / intervalo;
     const incremento = valorFinal / passos;
 
@@ -192,25 +143,16 @@ function animarNumero(elementId, valorFinal) {
     }, intervalo);
 }
 
-// ============================================================
-// 6. BUSCA EM TEMPO REAL
-//
-// Filtramos o livrosCached localmente, sem chamar o backend.
-// toLowerCase() garante busca case-insensitive (maiúsculas
-// e minúsculas tratadas igualmente).
-// includes() verifica se a string contém o termo buscado.
-// ============================================================
+
 function filtrarLivros(termo) {
     const grid      = document.getElementById('booksGrid');
     const semResult = document.getElementById('semResultados');
     const btnLimpar = document.getElementById('btnLimparBusca');
 
-    // Mostra/esconde botão de limpar dependendo se há texto
     btnLimpar.style.display = termo.length > 0 ? 'flex' : 'none';
 
     const termoNorm = termo.toLowerCase().trim();
 
-    // Se não há termo, mostra tudo
     if (!termoNorm) {
         semResult.style.display = 'none';
         renderizarCards(livrosCached);
@@ -218,7 +160,6 @@ function filtrarLivros(termo) {
         return;
     }
 
-    // Filtra por título OU autor
     const resultado = livrosCached.filter(livro =>
         livro.title.toLowerCase().includes(termoNorm) ||
         livro.author.toLowerCase().includes(termoNorm)
@@ -243,10 +184,6 @@ function limparBusca() {
     filtrarLivros('');
 }
 
-// ============================================================
-// 7. CONTADOR
-// Mostra "X obras" ou "X de Y obras" quando há filtro ativo
-// ============================================================
 function atualizarContador(visiveis, total) {
     const el = document.getElementById('bookCount');
     if (visiveis === total) {
@@ -256,9 +193,7 @@ function atualizarContador(visiveis, total) {
     }
 }
 
-// ============================================================
-// 8. MODAL
-// ============================================================
+
 function abrirModal() {
     tituloEditando = null;
     document.getElementById('modalTitulo').textContent    = 'Nova Obra';
@@ -287,9 +222,6 @@ function fecharModalFora(event) {
     if (event.target.id === 'modalOverlay') fecharModal();
 }
 
-// ============================================================
-// 9. SALVAR LIVRO
-// ============================================================
 async function salvarLivro() {
     const titulo    = document.getElementById('campoTitulo').value.trim();
     const autor     = document.getElementById('campoAutor').value.trim();
@@ -329,7 +261,6 @@ async function salvarLivro() {
                 'success'
             );
             fecharModal();
-            // Limpa a busca e recarrega tudo do backend
             limparBusca();
             await carregarLivros();
         } else {
@@ -343,9 +274,6 @@ async function salvarLivro() {
     }
 }
 
-// ============================================================
-// 10. DELETAR LIVRO
-// ============================================================
 async function deletarLivro(titulo) {
     if (!confirm(`Deseja remover "${titulo}" do acervo?`)) return;
 
@@ -367,10 +295,6 @@ async function deletarLivro(titulo) {
         mostrarMensagem('Não foi possível conectar ao servidor.', 'error');
     }
 }
-
-// ============================================================
-// 11. MENSAGEM DE FEEDBACK
-// ============================================================
 function mostrarMensagem(texto, tipo = 'info') {
     const el = document.getElementById('message');
     el.textContent = texto;
@@ -378,10 +302,6 @@ function mostrarMensagem(texto, tipo = 'info') {
     el.style.display = 'block';
     setTimeout(() => { el.style.display = 'none'; }, 4000);
 }
-
-// ============================================================
-// INICIALIZAÇÃO
-// ============================================================
 window.addEventListener('load', () => {
     carregarUsuario();
     carregarLivros();

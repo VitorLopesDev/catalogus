@@ -5,66 +5,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catalogus — Login</title>
 
-    <!--
-        ETAPA 1 — FONTES
-        Importamos duas fontes do Google Fonts:
-        - Playfair Display: serifada elegante, usada nos títulos
-        - Lora: serifada mais leve, usada nos textos e labels
-        O parâmetro display=swap evita o flash de texto invisível enquanto a fonte carrega
-    -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lora:wght@400;600&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<!--
-    ESTRUTURA DA PÁGINA
-    .page-wrapper     → fundo com textura de papel, ocupa a tela inteira
-    .login-container  → caixa central com borda decorativa
-    .login-header     → área do logo e título
-    .divider          → linha decorativa com ornamento central
-    .tab-switcher     → botões para alternar entre Login e Cadastro
-    .form-panel       → cada formulário (login / registro)
--->
-
 <div class="page-wrapper">
 
-    <!-- Elementos decorativos de fundo -->
     <div class="bg-decoration bg-deco-left">❧</div>
     <div class="bg-decoration bg-deco-right">❧</div>
 
     <div class="login-container">
 
-        <!-- HEADER: Logo e subtítulo -->
         <div class="login-header">
             <div class="quill-icon">✒</div>
             <h1 class="brand-title">Catalogus</h1>
             <p class="brand-subtitle">Gerenciamento de Acervo Literário</p>
         </div>
 
-        <!-- DIVISOR decorativo com ornamento -->
         <div class="divider">
             <span class="divider-line"></span>
             <span class="divider-ornament">❦</span>
             <span class="divider-line"></span>
         </div>
 
-        <!-- ABAS: alternar entre Login e Cadastro -->
         <div class="tab-switcher">
             <button class="tab-btn active" onclick="showTab('login', this)">Entrar</button>
             <button class="tab-btn" onclick="showTab('register', this)">Cadastrar</button>
         </div>
 
-        <!-- PAINEL DE LOGIN -->
         <div id="loginPanel" class="form-panel active">
             <form id="loginFormElement" novalidate>
 
                 <div class="form-group">
-                    <!--
-                        for="loginEmail" conecta o label ao input pelo ID.
-                        Isso melhora acessibilidade — clicar no label foca o campo.
-                    -->
+
                     <label for="loginEmail">Endereço de E-mail</label>
                     <div class="input-wrapper">
                         <span class="input-icon">✉</span>
@@ -98,7 +73,6 @@
             </form>
         </div>
 
-        <!-- PAINEL DE CADASTRO -->
         <div id="registerPanel" class="form-panel">
             <form id="registerFormElement" novalidate>
 
@@ -149,11 +123,10 @@
             </form>
         </div>
 
-        <!-- MENSAGEM DE FEEDBACK (sucesso / erro) -->
         <div id="message" class="message" role="alert" aria-live="polite"></div>
 
-    </div><!-- /login-container -->
-</div><!-- /page-wrapper -->
+    </div>
+</div>
 
 <script src="auth.js"></script>
 </body>
