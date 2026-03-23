@@ -1,7 +1,6 @@
 package io.thalita.vitor.catalogus.controller;
 
 import io.thalita.vitor.catalogus.dto.BookRequestDTO;
-import io.thalita.vitor.catalogus.dto.BookResponseDTO;
 import io.thalita.vitor.catalogus.model.Book;
 import io.thalita.vitor.catalogus.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,38 +19,39 @@ public class BookController {
     private BookService bookService;
 
     @GetMapping("/list")
-    public ResponseEntity<List<Book>> listBooks(){
+    public ResponseEntity<List<Book>> listBooks() {
         List<Book> books = bookService.findAllBooks();
-
-        if(books.isEmpty()){
-            return ResponseEntity.noContent().build();
-        }
+        if (books.isEmpty()) return ResponseEntity.noContent().build();
         return ResponseEntity.ok(books);
     }
 
-
     @PostMapping
-    public ResponseEntity<?> addBook(@RequestBody BookRequestDTO dto){
+    public ResponseEntity<?> addBook(@RequestBody BookRequestDTO dto) {
         Book response = bookService.createBook(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @DeleteMapping("/{title}")
-    public ResponseEntity<Void> deleteBook(@PathVariable String title){
+    public ResponseEntity<Void> deleteBook(@PathVariable String title) {
         bookService.deleteBook(title);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{title}")
-    public ResponseEntity<Book> findBook(@PathVariable String title){
+    public ResponseEntity<Book> findBook(@PathVariable String title) {
         Book book = bookService.findBookByTitle(title);
         return ResponseEntity.ok().body(book);
     }
 
     @PutMapping("/{title}")
-    public ResponseEntity<Book> replaceBook(@RequestBody BookRequestDTO dto){
+    public ResponseEntity<Book> replaceBook(@RequestBody BookRequestDTO dto) {
         Book book = bookService.replaceBook(dto);
         return ResponseEntity.ok().body(book);
     }
 
+    @PatchMapping("/{title}/favorite")
+    public ResponseEntity<Book> toggleFavorite(@PathVariable String title) {
+        Book book = bookService.toggleFavorite(title);
+        return ResponseEntity.ok().body(book);
+    }
 }

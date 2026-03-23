@@ -6,14 +6,14 @@ public class BookResponseDTO {
     private String title;
     private String author;
     private String isbn;
-    private String description;
+    private String comment;
 
-    public BookResponseDTO(Long id, String title, String author, String isbn, String description) {
+    public BookResponseDTO(Long id, String title, String author, String isbn, String comment) {
         this.id = id;
         this.title = title;
         this.author = author;
         this.isbn = isbn;
-        this.description = description;
+        this.comment = comment;
     }
 
     public Long getId() { return id; }
@@ -21,6 +21,6 @@ public class BookResponseDTO {
     public String getAuthor() { return author; }
     public String getIsbn() { return isbn; }
     public String getDescription(){
-        return description;
+        return comment;
     }
 }

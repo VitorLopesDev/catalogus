@@ -8,7 +8,6 @@ import io.thalita.vitor.catalogus.repository.BookRepository;
 import io.thalita.vitor.catalogus.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -23,91 +22,89 @@ public class BookService {
     @Autowired
     private RestTemplate restTemplate;
 
-    public List<Book> findAllBooks(){
+    public List<Book> findAllBooks() {
         return bookRepository.findAll();
     }
-
 
     public Book createBook(BookRequestDTO dto) {
         Book bookExist = bookRepository.findByTitle(dto.getTitle());
         User owner = userRepository.findByEmail(dto.getOwnerEmail());
 
-
-        if (bookExist != null) {
-            throw new RuntimeException("O Livro já cadastrado");
-        }
-        if (owner == null) {
-            throw new RuntimeException("Usuário não encontrado");
-        }
+        if (bookExist != null) throw new RuntimeException("O Livro já cadastrado");
+        if (owner == null)     throw new RuntimeException("Usuário não encontrado");
 
         Book book = new Book();
         book.setTitle(dto.getTitle());
         book.setAuthor(dto.getAuthor());
         book.setStatus(dto.getStatus() != null ? dto.getStatus() : ReadingStatus.NAO_LIDO);
         book.setIsbn(dto.getIsbn());
-        book.setDescription(dto.getDescription());
+        book.setComment(dto.getComment());
         book.setOwner(owner);
         book.setRating(dto.getRating());
-        book.setCurrentPage(dto.getCurrentPage());
 
         if (dto.getIsbn() != null && !dto.getIsbn().isBlank()) {
             buscarDadosOpenLibrary(book, dto.getIsbn());
         }
+
         if (dto.getStatus() == ReadingStatus.NAO_LIDO) {
             book.setCurrentPage(0);
         } else if (dto.getStatus() == ReadingStatus.LIDO) {
             book.setCurrentPage(book.getPages());
-        }else{
-            book.setCurrentPage(book.getCurrentPage());
+            book.setReadDate(dto.getReadDate());
+        } else {
+            book.setCurrentPage(dto.getCurrentPage());
         }
 
         return bookRepository.save(book);
     }
 
-    public void deleteBook(String title){
+    public void deleteBook(String title) {
         Book book = bookRepository.findByTitle(title);
-        if(book == null){
-            throw new RuntimeException("Livro não encontrado");
-        }
+        if (book == null) throw new RuntimeException("Livro não encontrado");
         bookRepository.delete(book);
     }
 
-
-    public Book findBookByTitle(String title){
+    public Book findBookByTitle(String title) {
         Book book = bookRepository.findByTitle(title);
-        if(book == null){
-            throw new RuntimeException("Livro não encontrado");
-        }
+        if (book == null) throw new RuntimeException("Livro não encontrado");
         return book;
     }
 
-    public Book replaceBook(BookRequestDTO dto){
+    public Book replaceBook(BookRequestDTO dto) {
         Book book = bookRepository.findByTitle(dto.getTitle());
-        if(book == null){
-            throw new RuntimeException("Livro não encontrado");
-        }
+        if (book == null) throw new RuntimeException("Livro não encontrado");
+
         book.setAuthor(dto.getAuthor());
         book.setStatus(dto.getStatus());
         book.setTitle(dto.getTitle());
         book.setIsbn(dto.getIsbn());
-        book.setDescription(dto.getDescription());
+        book.setComment(dto.getComment());
         book.setRating(dto.getRating());
-        book.setCurrentPage(dto.getCurrentPage());
 
         if (dto.getIsbn() != null && !dto.getIsbn().isBlank()) {
             buscarDadosOpenLibrary(book, dto.getIsbn());
         }
+
         if (dto.getStatus() == ReadingStatus.NAO_LIDO) {
             book.setCurrentPage(0);
+            book.setReadDate(null);
         } else if (dto.getStatus() == ReadingStatus.LIDO) {
             book.setCurrentPage(book.getPages());
-        }else{
-            book.setCurrentPage(book.getCurrentPage());
+            book.setReadDate(dto.getReadDate());
+        } else {
+            book.setCurrentPage(dto.getCurrentPage());
+            book.setReadDate(null);
         }
 
         bookRepository.saveAndFlush(book);
-
         return book;
+    }
+
+    public Book toggleFavorite(String title) {
+        Book book = bookRepository.findByTitle(title);
+        if (book == null) throw new RuntimeException("Livro não encontrado");
+        book.setFavorite(!book.isFavorite());
+        return bookRepository.save(book);
     }
 
     private void buscarDadosOpenLibrary(Book book, String isbn) {
@@ -129,7 +126,7 @@ public class BookService {
                 book.setCoverUrl("https://covers.openlibrary.org/b/isbn/" + isbn + "-M.jpg");
             }
         } catch (Exception e) {
-            // Se falhar, salva o livro sem esses dados
+
         }
     }
 }
