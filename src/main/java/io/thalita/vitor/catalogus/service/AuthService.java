@@ -17,14 +17,14 @@ public class AuthService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public boolean login(String username, String password) {
+    public User login(String username, String password) {
         User user = userRepository.findByEmail(username);
 
         if (user == null) {
-            return false;
+            return null;
         }
 
-        return passwordEncoder.matches(password, user.getPassword());
+        return passwordEncoder.matches(password, user.getPassword()) ? user : null;
     }
 
     public User register(String nickName, String email, String password) {

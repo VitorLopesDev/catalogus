@@ -19,13 +19,14 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        boolean success = authService.login(request.getEmail(), request.getPassword());
-        if(success != true){
+        User user = authService.login(request.getEmail(), request.getPassword());
+        if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("menssage", "Credenciais inválidas."));
+                    .body(Map.of("message", "Credenciais inválidas."));
         }
-        return ResponseEntity.ok(Map.of("menssage", "Login realizado com sucesso.",
-                "email", request.getEmail()));
+        return ResponseEntity.ok(Map.of("message", "Login realizado com sucesso.",
+                "email", user.getEmail(),
+                "nickname", user.getNickName()));
     }
 
     @PostMapping("/register")

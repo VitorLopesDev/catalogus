@@ -1,11 +1,13 @@
 package io.thalita.vitor.catalogus.dto;
 
 import io.thalita.vitor.catalogus.model.ReadingStatus;
+import io.thalita.vitor.catalogus.model.User;
 
 import java.time.LocalDate;
 
 public class BookRequestDTO {
     private Long id;
+    private User owner;
     private String ownerEmail;
     private ReadingStatus status;
     private String title;
@@ -17,6 +19,9 @@ public class BookRequestDTO {
     private LocalDate readDate;
 
     public Long getId() { return id; }
+    public User getOwner() {
+        return owner;
+    }
     public String getOwnerEmail() { return ownerEmail; }
     public ReadingStatus getStatus() { return status; }
     public String getAuthor() { return author; }
@@ -27,6 +32,10 @@ public class BookRequestDTO {
     public Integer getCurrentPage() { return currentPage; }
     public LocalDate getReadDate() { return readDate; }
 
+
+    public void setOwner(User owner) {
+        this.owner = owner;
+    }
     public void setOwnerEmail(String ownerEmail) { this.ownerEmail = ownerEmail; }
     public void setAuthor(String author) { this.author = author; }
     public void setStatus(ReadingStatus status) { this.status = status; }

@@ -1,4 +1,3 @@
-
 const API_URL = 'http://localhost:8080';
 
 function showTab(tabName, btnClicado) {
@@ -50,6 +49,7 @@ document.getElementById('loginFormElement').addEventListener('submit', async (e)
 
         if (response.ok) {
             localStorage.setItem('userEmail', data.email);
+            localStorage.setItem('userNickname', data.nickname);
             mostrarMensagem('Acervo aberto com sucesso!', 'success');
 
             setTimeout(() => {

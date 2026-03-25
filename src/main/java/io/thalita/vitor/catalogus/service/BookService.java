@@ -27,11 +27,11 @@ public class BookService {
     }
 
     public Book createBook(BookRequestDTO dto) {
-        Book bookExist = bookRepository.findByTitle(dto.getTitle());
         User owner = userRepository.findByEmail(dto.getOwnerEmail());
+        if (owner == null) throw new RuntimeException("Usuário não encontrado");
 
+        Book bookExist = bookRepository.findByTitleAndOwner(dto.getTitle(), owner);
         if (bookExist != null) throw new RuntimeException("O Livro já cadastrado");
-        if (owner == null)     throw new RuntimeException("Usuário não encontrado");
 
         Book book = new Book();
         book.setTitle(dto.getTitle());
@@ -58,20 +58,34 @@ public class BookService {
         return bookRepository.save(book);
     }
 
-    public void deleteBook(String title) {
-        Book book = bookRepository.findByTitle(title);
+    public void deleteBook(String title, String email) {
+        User owner = userRepository.findByEmail(email);
+        if (owner == null) throw new RuntimeException("Usuário não encontrado");
+
+        Book book = bookRepository.findByTitleAndOwner(title, owner);
         if (book == null) throw new RuntimeException("Livro não encontrado");
+
         bookRepository.delete(book);
     }
 
-    public Book findBookByTitle(String title) {
-        Book book = bookRepository.findByTitle(title);
+    public Book findBookByTitle(String title, String email) {
+        User owner = userRepository.findByEmail(email);
+        if (owner == null) throw new RuntimeException("Usuário não encontrado");
+
+        Book book = bookRepository.findByTitleAndOwner(title, owner);
         if (book == null) throw new RuntimeException("Livro não encontrado");
         return book;
     }
 
+    public List<Book> findAllBooks(String email) {
+        return bookRepository.findByOwnerEmail(email);
+    }
+
     public Book replaceBook(BookRequestDTO dto) {
-        Book book = bookRepository.findByTitle(dto.getTitle());
+        User owner = userRepository.findByEmail(dto.getOwnerEmail());
+        if (owner == null) throw new RuntimeException("Usuário não encontrado");
+
+        Book book = bookRepository.findByTitleAndOwner(dto.getTitle(), owner);
         if (book == null) throw new RuntimeException("Livro não encontrado");
 
         book.setAuthor(dto.getAuthor());
@@ -100,9 +114,13 @@ public class BookService {
         return book;
     }
 
-    public Book toggleFavorite(String title) {
-        Book book = bookRepository.findByTitle(title);
+    public Book toggleFavorite(String title, String email) {
+        User owner = userRepository.findByEmail(email);
+        if (owner == null) throw new RuntimeException("Usuário não encontrado");
+
+        Book book = bookRepository.findByTitleAndOwner(title, owner);
         if (book == null) throw new RuntimeException("Livro não encontrado");
+
         book.setFavorite(!book.isFavorite());
         return bookRepository.save(book);
     }
@@ -126,7 +144,6 @@ public class BookService {
                 book.setCoverUrl("https://covers.openlibrary.org/b/isbn/" + isbn + "-M.jpg");
             }
         } catch (Exception e) {
-
         }
     }
 }

@@ -14,7 +14,6 @@ function carregarUsuario() {
     document.getElementById('navUserEmail').textContent = nickname;
 }
 
-
 function mudarAba(aba) {
     abaAtual = aba;
 
@@ -34,13 +33,14 @@ function renderizarAbaAtual() {
     }
 }
 
-
 async function toggleFavorito(titulo, event) {
     event.stopPropagation();
 
+    const email = localStorage.getItem('userEmail');
+
     try {
         const response = await fetch(
-            `${API_URL}/book/${encodeURIComponent(titulo)}/favorite`,
+            `${API_URL}/book/${encodeURIComponent(titulo)}/favorite?email=${encodeURIComponent(email)}`,
             { method: 'PATCH' }
         );
 
@@ -58,7 +58,6 @@ async function toggleFavorito(titulo, event) {
         mostrarMensagem('Não foi possível conectar ao servidor.', 'error');
     }
 }
-
 
 function fecharModalDetalhes(event) {
     if (!event || event.target.id === 'modalDetalhesOverlay') {
@@ -80,12 +79,11 @@ async function abrirModalDetalhes(livro) {
     document.getElementById('modalDetalhesOverlay').classList.add('aberto');
 }
 
-
 function logout() {
     localStorage.removeItem('userEmail');
+    localStorage.removeItem('userNickname');
     window.location.href = 'index.html';
 }
-
 
 async function carregarLivros() {
     const grid       = document.getElementById('booksGrid');
@@ -99,7 +97,8 @@ async function carregarLivros() {
     emptyState.style.display = 'none';
 
     try {
-        const response = await fetch(`${API_URL}/book/list`);
+        const email = localStorage.getItem('userEmail');
+        const response = await fetch(`${API_URL}/book/list?email=${encodeURIComponent(email)}`);
 
         if (response.status === 204) {
             livrosCached = [];
@@ -131,7 +130,6 @@ async function carregarLivros() {
             </div>`;
     }
 }
-
 
 function renderizarCards(livros, isFavoritos = false) {
     const grid          = document.getElementById('booksGrid');
@@ -233,7 +231,6 @@ function criarCard(livro, index = 0) {
     return card;
 }
 
-
 function atualizarCampoPagina() {
     const status      = document.getElementById('campoStatus').value;
     const grupoPagina = document.getElementById('grupoPaginaAtual');
@@ -250,7 +247,6 @@ function exibirEstrelas(rating) {
     const meia   = rating % 1 >= 0.5 ? '⯪' : '';
     return '★'.repeat(cheias) + meia;
 }
-
 
 function atualizarEstatisticas(livros) {
     const total         = livros.length;
@@ -279,7 +275,6 @@ function animarNumero(elementId, valorFinal) {
         el.textContent = Math.floor(atual);
     }, intervalo);
 }
-
 
 function filtrarLivros(termo) {
     const grid      = document.getElementById('booksGrid');
@@ -329,7 +324,6 @@ function atualizarContador(visiveis, total) {
     }
 }
 
-
 async function buscarPorIsbn() {
     const isbn = document.getElementById('campoIsbn').value.trim();
 
@@ -360,7 +354,6 @@ async function buscarPorIsbn() {
         mostrarMensagem('Erro ao conectar com a base de dados.', 'error');
     }
 }
-
 
 function abrirModal() {
     tituloEditando = null;
@@ -404,7 +397,6 @@ function fecharModal() {
 function fecharModalFora(event) {
     if (event.target.id === 'modalOverlay') fecharModal();
 }
-
 
 async function salvarLivro() {
     const titulo      = document.getElementById('campoTitulo').value.trim();
@@ -454,13 +446,14 @@ async function salvarLivro() {
     }
 }
 
-
 async function deletarLivro(titulo) {
     if (!confirm(`Deseja remover "${titulo}" do acervo?`)) return;
 
+    const email = localStorage.getItem('userEmail');
+
     try {
         const response = await fetch(
-            `${API_URL}/book/${encodeURIComponent(titulo)}`,
+            `${API_URL}/book/${encodeURIComponent(titulo)}?email=${encodeURIComponent(email)}`,
             { method: 'DELETE' }
         );
 
@@ -477,7 +470,6 @@ async function deletarLivro(titulo) {
     }
 }
 
-
 function mostrarMensagem(texto, tipo = 'info') {
     const el = document.getElementById('message');
     el.textContent = texto;
@@ -485,7 +477,6 @@ function mostrarMensagem(texto, tipo = 'info') {
     el.style.display = 'block';
     setTimeout(() => { el.style.display = 'none'; }, 4000);
 }
-
 
 window.addEventListener('load', () => {
     carregarUsuario();

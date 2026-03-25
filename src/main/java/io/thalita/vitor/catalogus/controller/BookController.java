@@ -19,8 +19,8 @@ public class BookController {
     private BookService bookService;
 
     @GetMapping("/list")
-    public ResponseEntity<List<Book>> listBooks() {
-        List<Book> books = bookService.findAllBooks();
+    public ResponseEntity<List<Book>> listBooks(@RequestParam String email) {
+        List<Book> books = bookService.findAllBooks(email);
         if (books.isEmpty()) return ResponseEntity.noContent().build();
         return ResponseEntity.ok(books);
     }
@@ -32,14 +32,14 @@ public class BookController {
     }
 
     @DeleteMapping("/{title}")
-    public ResponseEntity<Void> deleteBook(@PathVariable String title) {
-        bookService.deleteBook(title);
+    public ResponseEntity<Void> deleteBook(@PathVariable String title, @RequestParam String email) {
+        bookService.deleteBook(title, email);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{title}")
-    public ResponseEntity<Book> findBook(@PathVariable String title) {
-        Book book = bookService.findBookByTitle(title);
+    public ResponseEntity<Book> findBook(@PathVariable String title, @RequestParam String email) {
+        Book book = bookService.findBookByTitle(title, email);
         return ResponseEntity.ok().body(book);
     }
 
@@ -50,8 +50,8 @@ public class BookController {
     }
 
     @PatchMapping("/{title}/favorite")
-    public ResponseEntity<Book> toggleFavorite(@PathVariable String title) {
-        Book book = bookService.toggleFavorite(title);
+    public ResponseEntity<Book> toggleFavorite(@PathVariable String title, @RequestParam String email) {
+        Book book = bookService.toggleFavorite(title, email);
         return ResponseEntity.ok().body(book);
     }
 }
