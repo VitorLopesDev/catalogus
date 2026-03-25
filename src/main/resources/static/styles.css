@@ -462,7 +462,7 @@ body {
 .nav-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 14px 32px;
+    padding: 12px 0px;
     display: grid;
     grid-template-columns: auto 1fr auto;
     gap: 24px;
